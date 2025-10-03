@@ -7,7 +7,7 @@ namespace DndTool.Commands.SessionCommands
     {
         private readonly Sessions _sessions;
         private readonly string _sessionName;
-        private int? _oldCurrentSessionIndexNumber;
+        private int _oldCurrentSessionIndexNumber;
 
         public CreateNewSessionCommand(Sessions sessions, string sessionName)
         {
@@ -20,23 +20,18 @@ namespace DndTool.Commands.SessionCommands
 
         public void Execute()
         {
-            var sessionQueries = new SessionQueries();
-            _oldCurrentSessionIndexNumber = sessionQueries.CurrentSession(_sessions)?.IndexNumber;
-            var indexNumber = sessionQueries.GetNewSessionIndex(_sessions);
-            var session = new Session(indexNumber, _sessionName);
+            _oldCurrentSessionIndexNumber = _sessions.CurrentSessionIndex;
+
+            var session = new Session(++_sessions.CurrentSessionIndex, _sessionName);
             _sessions.SessionList.Add(session);
-            _sessions.CurrentSessionIndex = session.IndexNumber;
         }
 
         public void Undo()
         {
             var sessionQueries = new SessionQueries();
-            var lastSession = sessionQueries.Last(_sessions);
-            if (lastSession != null && _oldCurrentSessionIndexNumber.HasValue)
-            {
-                _sessions.SessionList.Remove(lastSession);
-                _sessions.CurrentSessionIndex = _oldCurrentSessionIndexNumber.Value;
-            }
+            var lastSession = sessionQueries.GetLastSession(_sessions)!;
+            _sessions.SessionList.Remove(lastSession);
+            _sessions.CurrentSessionIndex = _oldCurrentSessionIndexNumber;
         }
     }
 }

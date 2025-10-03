@@ -1,4 +1,6 @@
-﻿namespace DndTool.Views
+﻿using System.Windows.Forms;
+
+namespace DndTool.Views
 {
     partial class DmTool
     {
@@ -36,6 +38,7 @@
             NewCampaignToolStripMenuItem = new ToolStripMenuItem();
             LoadCampaignToolStripMenuItem = new ToolStripMenuItem();
             SessionPanel = new Panel();
+            LastAdministrationLabel = new Label();
             SessionHistoryButton = new Button();
             SessionIndexNumberLabel = new Label();
             SessionNameTextBox = new TextBox();
@@ -46,8 +49,12 @@
             NewSessionButton = new Button();
             NextSessionButton = new Button();
             PreviousSessionButton = new Button();
+            BodyTabControl = new TabControl();
+            PlayersTabPage = new TabPage();
+            tabPage2 = new TabPage();
             MainMenuStrip.SuspendLayout();
             SessionPanel.SuspendLayout();
+            BodyTabControl.SuspendLayout();
             SuspendLayout();
             // 
             // MainMenuStrip
@@ -111,6 +118,7 @@
             // 
             SessionPanel.AutoSize = true;
             SessionPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            SessionPanel.Controls.Add(LastAdministrationLabel);
             SessionPanel.Controls.Add(SessionHistoryButton);
             SessionPanel.Controls.Add(SessionIndexNumberLabel);
             SessionPanel.Controls.Add(SessionNameTextBox);
@@ -127,16 +135,28 @@
             SessionPanel.Size = new Size(1320, 38);
             SessionPanel.TabIndex = 1;
             // 
+            // LastAdministrationLabel
+            // 
+            LastAdministrationLabel.AutoSize = true;
+            LastAdministrationLabel.Font = new Font("Segoe UI", 15F);
+            LastAdministrationLabel.Location = new Point(1088, 8);
+            LastAdministrationLabel.Name = "LastAdministrationLabel";
+            LastAdministrationLabel.Size = new Size(23, 28);
+            LastAdministrationLabel.TabIndex = 10;
+            LastAdministrationLabel.Text = "0";
+            LastAdministrationLabel.Click += LastAdministrationLabel_Click;
+            // 
             // SessionHistoryButton
             // 
             SessionHistoryButton.BackgroundImage = (Image)resources.GetObject("SessionHistoryButton.BackgroundImage");
             SessionHistoryButton.BackgroundImageLayout = ImageLayout.Stretch;
             SessionHistoryButton.ForeColor = Color.Black;
-            SessionHistoryButton.Location = new Point(988, 11);
+            SessionHistoryButton.Location = new Point(988, 12);
             SessionHistoryButton.Name = "SessionHistoryButton";
             SessionHistoryButton.Size = new Size(23, 23);
             SessionHistoryButton.TabIndex = 9;
             SessionHistoryButton.UseVisualStyleBackColor = true;
+            SessionHistoryButton.Click += SessionHistoryButton_Click;
             // 
             // SessionIndexNumberLabel
             // 
@@ -231,12 +251,45 @@
             PreviousSessionButton.UseVisualStyleBackColor = true;
             PreviousSessionButton.Click += PreviousSessionButton_Click;
             // 
+            // BodyTabControl
+            // 
+            BodyTabControl.Controls.Add(PlayersTabPage);
+            BodyTabControl.Controls.Add(tabPage2);
+            BodyTabControl.Dock = DockStyle.Fill;
+            BodyTabControl.Location = new Point(0, 62);
+            BodyTabControl.Name = "BodyTabControl";
+            BodyTabControl.SelectedIndex = 0;
+            BodyTabControl.Size = new Size(1320, 667);
+            BodyTabControl.TabIndex = 2;
+            BodyTabControl.Resize += BodyTabControl_Resize;
+            // 
+            // PlayersTabPage
+            // 
+            PlayersTabPage.BackColor = Color.FromArgb(38, 40, 42);
+            PlayersTabPage.Location = new Point(4, 24);
+            PlayersTabPage.Name = "PlayersTabPage";
+            PlayersTabPage.Padding = new Padding(3);
+            PlayersTabPage.Size = new Size(1312, 639);
+            PlayersTabPage.TabIndex = 0;
+            PlayersTabPage.Text = "Players";
+            // 
+            // tabPage2
+            // 
+            tabPage2.Location = new Point(4, 24);
+            tabPage2.Name = "tabPage2";
+            tabPage2.Padding = new Padding(3);
+            tabPage2.Size = new Size(1312, 639);
+            tabPage2.TabIndex = 1;
+            tabPage2.Text = "tabPage2";
+            tabPage2.UseVisualStyleBackColor = true;
+            // 
             // DmTool
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(38, 40, 42);
             ClientSize = new Size(1320, 729);
+            Controls.Add(BodyTabControl);
             Controls.Add(SessionPanel);
             Controls.Add(MainMenuStrip);
             ForeColor = Color.White;
@@ -248,6 +301,7 @@
             MainMenuStrip.PerformLayout();
             SessionPanel.ResumeLayout(false);
             SessionPanel.PerformLayout();
+            BodyTabControl.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -271,5 +325,9 @@
         private DateTimePicker SessionStartDateDateTimePicker;
         private Label SessionIndexNumberLabel;
         private Button SessionHistoryButton;
+        private Label LastAdministrationLabel;
+        private TabControl BodyTabControl;
+        private TabPage PlayersTabPage;
+        private TabPage tabPage2;
     }
 }

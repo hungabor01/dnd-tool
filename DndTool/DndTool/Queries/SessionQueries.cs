@@ -4,7 +4,7 @@ namespace DndTool.Queries
 {
     internal class SessionQueries
     {
-        public Session? CurrentSession(Sessions sessions)
+        public Session? GetCurrentSession(Sessions sessions)
         {
             ArgumentNullException.ThrowIfNull(sessions, nameof(sessions));
 
@@ -12,14 +12,7 @@ namespace DndTool.Queries
             return sessions.SessionList.SingleOrDefault(session => session.IndexNumber == currentSessionIndex);
         }
 
-        public int GetNewSessionIndex(Sessions sessions)
-        {
-            ArgumentNullException.ThrowIfNull(sessions, nameof(sessions));
-
-            return sessions.SessionList.Count;
-        }
-
-        public Session? Last(Sessions sessions)
+        public Session? GetLastSession(Sessions sessions)
         {
             ArgumentNullException.ThrowIfNull(sessions, nameof(sessions));
 

@@ -19,5 +19,9 @@ namespace DndTool.Persistence.PersistenceFacades
         public Task CreateNewCampaign(string name);
 
         public Task LoadCampaign(string name);
+
+        public Task SaveSessionHistoryFolder(string? sessionHistoryFolder);
+
+        public Task<Player> CreateNewPlayer(string playerName);
     }
 }

@@ -8,7 +8,7 @@ namespace DndTool.Commands.SessionCommands
         private readonly DateTime _newDateTime;
         private DateTime? _oldEndDateTime;
 
-        public ChangeSessionEndDateCommand(Session? session, DateTime newDateTime)
+        public ChangeSessionEndDateCommand(Session session, DateTime newDateTime)
         {
             ArgumentNullException.ThrowIfNull(session, nameof(session));
 
@@ -24,10 +24,7 @@ namespace DndTool.Commands.SessionCommands
 
         public void Undo()
         {
-            if (_oldEndDateTime.HasValue)
-            {
-                _session.EndDate = _oldEndDateTime.Value;
-            }
+            _session.EndDate = _oldEndDateTime!.Value;
         }
     }
 }

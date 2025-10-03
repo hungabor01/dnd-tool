@@ -1,4 +1,5 @@
 ﻿using DndTool.Commands.CampaignCommands;
+using DndTool.Commands.PlayerCommands;
 using DndTool.Commands.SessionCommands;
 using DndTool.Common;
 using DndTool.Models;
@@ -56,6 +57,12 @@ namespace DndTool.ViewModels
             await _persistenceFacade.Execute(changeDateCommand);
         }
 
+        public async Task ChangeLastAdministrationDate()
+        {
+            var changeDateCommand = new ChangeLastAdministrationDateCommand(_persistenceFacade.Campaign);
+            await _persistenceFacade.Execute(changeDateCommand);
+        }
+
         public async Task CreateNewSession(string sessionName)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(sessionName, nameof(sessionName));
@@ -67,7 +74,7 @@ namespace DndTool.ViewModels
         public async Task ChangeSessionStartDate(DateTime newDateTime)
         {
             var sessionQueries = new SessionQueries();
-            var currentSession = sessionQueries.CurrentSession(_persistenceFacade.Campaign.Sessions);
+            var currentSession = sessionQueries.GetCurrentSession(_persistenceFacade.Campaign.Sessions)!;
             var changeDateCommand = new ChangeSessionStartDateCommand(currentSession, newDateTime);
             await _persistenceFacade.Execute(changeDateCommand);
         }
@@ -75,7 +82,7 @@ namespace DndTool.ViewModels
         public async Task ChangeSessionEndDate(DateTime newDateTime)
         {
             var sessionQueries = new SessionQueries();
-            var currentSession = sessionQueries.CurrentSession(_persistenceFacade.Campaign.Sessions);
+            var currentSession = sessionQueries.GetCurrentSession(_persistenceFacade.Campaign.Sessions)!;
             var changeDateCommand = new ChangeSessionEndDateCommand(currentSession, newDateTime);
             await _persistenceFacade.Execute(changeDateCommand);
         }
@@ -85,7 +92,12 @@ namespace DndTool.ViewModels
             ArgumentException.ThrowIfNullOrWhiteSpace(newSessionName, nameof(newSessionName));
 
             var sessionQueries = new SessionQueries();
-            var currentSession = sessionQueries.CurrentSession(_persistenceFacade.Campaign.Sessions);
+            var currentSession = sessionQueries.GetCurrentSession(_persistenceFacade.Campaign.Sessions)!;
+            if (currentSession.Name == newSessionName)
+            {
+                return;
+            }
+
             var changeSessionNameCommand = new ChangeSessionNameCommand(currentSession, newSessionName);
             await _persistenceFacade.Execute(changeSessionNameCommand);
         }
@@ -100,6 +112,59 @@ namespace DndTool.ViewModels
         {
             var decrementCurrentSessionCommand = new DecrementCurrentSessionCommand(_persistenceFacade.Campaign.Sessions);
             await _persistenceFacade.Execute(decrementCurrentSessionCommand);
+        }
+
+        public async Task SaveSessionHistoryFolder(string? sessionHistoryFolder)
+        {
+            await _persistenceFacade.SaveSessionHistoryFolder(sessionHistoryFolder);
+        }
+
+        public async Task<Player> CreateNewPlayer(string playerName)
+        {
+            return await _persistenceFacade.CreateNewPlayer(playerName);
+        }
+
+        public async Task<bool> ChangePlayerProperty(Player player, int propertyIndex, bool isPropertyName, string? value)
+        {
+            ArgumentNullException.ThrowIfNull(player, nameof(player));
+
+            if (IsEmptyNewPropertyName(player, propertyIndex, isPropertyName, value)
+                || IsValueUnchanged(player, propertyIndex, isPropertyName, value))
+            {
+                return false;
+            }
+
+            var changePlayerPropertyCommand = new ChangePlayerPropertyCommand(player, propertyIndex, isPropertyName, value);
+            await _persistenceFacade.Execute(changePlayerPropertyCommand);
+            return true;
+        }
+
+        private bool IsEmptyNewPropertyName(Player player, int propertyIndex, bool isPropertyName, string? value)
+        {
+            return propertyIndex >= player.Properties.Count
+                   && isPropertyName
+                   && string.IsNullOrWhiteSpace(value);
+        }
+
+        private bool IsValueUnchanged(Player player, int propertyIndex, bool isPropertyName, string? value)
+        {
+            if (propertyIndex >= player.Properties.Count)
+            {
+                return false;
+            }
+
+            var playerProperty = player.Properties[propertyIndex];
+            return isPropertyName
+                ? playerProperty.PropertyName == value
+                : playerProperty.PropertyValue == value;
+        }
+
+        public async Task RemovePlayer(Player player)
+        {
+            ArgumentNullException.ThrowIfNull(player, nameof(player));
+
+            var removePlayerCommand = new RemovePlayerCommand(_persistenceFacade.Campaign, player);
+            await _persistenceFacade.Execute(removePlayerCommand);
         }
     }
 }

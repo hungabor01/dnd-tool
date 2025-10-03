@@ -8,7 +8,7 @@ namespace DndTool.Commands.SessionCommands
         private readonly DateTime _newDateTime;
         private DateTime? _oldStartDateTime;
 
-        public ChangeSessionStartDateCommand(Session? session, DateTime newDateTime)
+        public ChangeSessionStartDateCommand(Session session, DateTime newDateTime)
         {
             ArgumentNullException.ThrowIfNull(session, nameof(session));
 
@@ -24,10 +24,7 @@ namespace DndTool.Commands.SessionCommands
 
         public void Undo()
         {
-            if (_oldStartDateTime.HasValue)
-            {
-                _session.StartDate = _oldStartDateTime.Value;
-            }
+            _session.StartDate = _oldStartDateTime!.Value;
         }
     }
 }

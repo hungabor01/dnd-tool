@@ -9,5 +9,10 @@
 
             public static readonly string SaveFilesPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, SaveFilesDirectory);
         }
+
+        public class Sessions
+        {
+            public const int DefaultSessionIndex = -1;
+        }
     }
 }

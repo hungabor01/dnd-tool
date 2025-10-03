@@ -1,9 +1,11 @@
-﻿namespace DndTool.Models
+﻿using DndTool.Common;
+
+namespace DndTool.Models
 {
     public class Session
     {
-        public int IndexNumber { get; set; }
-        public string Name { get; set; } = "Session";
+        public int IndexNumber { get; set; } = Constants.Sessions.DefaultSessionIndex;
+        public string Name { get; set; } = string.Empty;
         public DateTime StartDate { get; set; } = DateTime.Now;
         public DateTime EndDate { get; set; } = DateTime.Now;
 

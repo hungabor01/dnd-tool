@@ -2,29 +2,27 @@
 
 namespace DndTool.Commands.CampaignCommands
 {
-    public class ChangeCurrentDateCommand : IUndoableCommand
+    public class ChangeLastAdministrationDateCommand : IUndoableCommand
     {
         private readonly Campaign _campaign;
-        private readonly DateTime _newDateTime;
         private DateTime? _oldDateTime;
 
-        public ChangeCurrentDateCommand(Campaign campaign, DateTime newDateTime)
+        public ChangeLastAdministrationDateCommand(Campaign campaign)
         {
             ArgumentNullException.ThrowIfNull(campaign, nameof(campaign));
 
             _campaign = campaign;
-            _newDateTime = newDateTime;
         }
 
         public void Execute()
         {
-            _oldDateTime = _campaign.CurrentDate;
-            _campaign.CurrentDate = _newDateTime;
+            _oldDateTime = _campaign.LastAdministrationDate;
+            _campaign.LastAdministrationDate = _campaign.CurrentDate;
         }
 
         public void Undo()
         {
-            _campaign.CurrentDate = _oldDateTime!.Value;
+            _campaign.LastAdministrationDate = _oldDateTime!.Value;
         }
     }
 }

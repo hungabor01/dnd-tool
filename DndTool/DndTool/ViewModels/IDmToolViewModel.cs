@@ -19,6 +19,8 @@ namespace DndTool.ViewModels
 
         public Task ChangeCurrentDate(DateTime newDateTime);
 
+        public Task ChangeLastAdministrationDate();
+
         public Task CreateNewSession(string sessionName);
 
         public Task ChangeSessionStartDate(DateTime newDateTime);
@@ -30,5 +32,13 @@ namespace DndTool.ViewModels
         public Task IncrementCurrentSession();
 
         public Task DecrementCurrentSession();
+
+        public Task SaveSessionHistoryFolder(string? sessionHistoryFolder);
+
+        public Task<Player> CreateNewPlayer(string playerName);
+
+        public Task<bool> ChangePlayerProperty(Player player, int propertyIndex, bool isPropertyName, string? value);
+
+        public Task RemovePlayer(Player player);
     }
 }

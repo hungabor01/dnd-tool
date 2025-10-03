@@ -2,9 +2,11 @@
 {
     public class Campaign
     {
-        public string Name { get; set; } = "Campaign";
+        public string Name { get; set; } = string.Empty;
         public DateTime CurrentDate { get; set; } = DateTime.Now;
-        public Sessions Sessions { get; set; } = new Sessions();
+        public DateTime LastAdministrationDate { get; set; } = DateTime.Now;
+        public string SessionHistoryFolder { get; set; } = string.Empty;
+        public Sessions Sessions { get; set; } = new();
         public IList<Player> Players { get; set; } = new List<Player>();
 
         public Campaign()

@@ -8,7 +8,7 @@ namespace DndTool.Commands.SessionCommands
         private readonly string _newSessionName;
         private string? _oldSessionName;
 
-        public ChangeSessionNameCommand(Session? session, string newSessionName)
+        public ChangeSessionNameCommand(Session session, string newSessionName)
         {
             ArgumentNullException.ThrowIfNull(session, nameof(session));
             ArgumentException.ThrowIfNullOrWhiteSpace(newSessionName, nameof(newSessionName));
@@ -25,10 +25,7 @@ namespace DndTool.Commands.SessionCommands
 
         public void Undo()
         {
-            if (!string.IsNullOrWhiteSpace(_oldSessionName))
-            {
-                _session.Name = _oldSessionName;
-            }
+            _session.Name = _oldSessionName!;
         }
     }
 }

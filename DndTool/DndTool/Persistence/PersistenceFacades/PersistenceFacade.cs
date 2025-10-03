@@ -27,90 +27,87 @@ namespace DndTool.Persistence.PersistenceFacades
             _campaignFileStorage = campaignFileStorage;
         }
 
-        public async Task CreateNewCampaign(string name)
-        {
-            ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
-
-            await _semaphoreSlim.WaitAsync();
-            try
-            {
-                _campaign = new Campaign(name);
-                await SaveCampaign();
-            }
-            finally
-            {
-                _semaphoreSlim.Release();
-            }
-        }
-
-        public async Task LoadCampaign(string name)
-        {
-            ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
-
-            await _semaphoreSlim.WaitAsync();
-            try
-            {
-                _campaign = await _campaignFileStorage.LoadFromFile<Campaign>(name);
-            }
-            finally
-            {
-                _semaphoreSlim.Release();
-            }
-        }
-
         public async Task Execute(IUndoableCommand undoableCommand)
         {
             ArgumentNullException.ThrowIfNull(undoableCommand, nameof(undoableCommand));
             ArgumentNullException.ThrowIfNull(Campaign, nameof(Campaign));
 
-            await _semaphoreSlim.WaitAsync();
-            try
+            await DoInSafeMode(async () =>
             {
                 _commandExecutor.Execute(undoableCommand);
                 await SaveCampaign();
 
                 CommandExecuted?.Invoke(this, EventArgs.Empty);
-            }
-            finally
-            {
-                _semaphoreSlim.Release();
-            }
+            });
         }
 
         public async Task Undo()
         {
             ArgumentNullException.ThrowIfNull(Campaign, nameof(Campaign));
 
-            await _semaphoreSlim.WaitAsync();
-            try
+            await DoInSafeMode(async () =>
             {
                 _commandExecutor.Undo();
                 await SaveCampaign();
 
                 CommandExecuted?.Invoke(this, EventArgs.Empty);
-            }
-            finally
-            {
-                _semaphoreSlim.Release();
-            }
+            });
         }
 
         public async Task Redo()
         {
             ArgumentNullException.ThrowIfNull(Campaign, nameof(Campaign));
 
-            await _semaphoreSlim.WaitAsync();
-            try
+            await DoInSafeMode(async () =>
             {
                 _commandExecutor.Redo();
                 await SaveCampaign();
 
                 CommandExecuted?.Invoke(this, EventArgs.Empty);
-            }
-            finally
+            });
+        }
+
+        public async Task CreateNewCampaign(string name)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
+
+            await DoInSafeMode(async () =>
             {
-                _semaphoreSlim.Release();
-            }
+                _campaign = new Campaign(name);
+                await SaveCampaign();
+            });
+        }
+
+        public async Task LoadCampaign(string name)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
+
+            await DoInSafeMode(async () =>
+            {
+                _campaign = await _campaignFileStorage.LoadFromFile<Campaign>(name);
+            });
+        }
+
+        public async Task SaveSessionHistoryFolder(string? sessionHistoryFolder)
+        {
+            await DoInSafeMode(async () =>
+            {
+                Campaign.SessionHistoryFolder = sessionHistoryFolder ?? string.Empty;
+                await SaveCampaign();
+            });
+        }
+
+        public async Task<Player> CreateNewPlayer(string playerName)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(playerName, nameof(playerName));
+
+            return await DoInSafeMode(async () =>
+            {
+                var player = new Player(playerName);
+                Campaign.Players.Add(player);
+                await SaveCampaign();
+                return player;
+            });
         }
 
         private async Task SaveCampaign()
@@ -118,6 +115,32 @@ namespace DndTool.Persistence.PersistenceFacades
             ArgumentNullException.ThrowIfNull(Campaign, nameof(Campaign));
 
             await _campaignFileStorage.SaveToFile(Campaign.Name, Campaign);
+        }
+
+        private async Task DoInSafeMode(Func<Task> action)
+        {
+            await _semaphoreSlim.WaitAsync();
+            try
+            {
+                await action();
+            }
+            finally
+            {
+                _semaphoreSlim.Release();
+            }
+        }
+
+        private async Task<T> DoInSafeMode<T>(Func<Task<T>> action)
+        {
+            await _semaphoreSlim.WaitAsync();
+            try
+            {
+                return await action();
+            }
+            finally
+            {
+                _semaphoreSlim.Release();
+            }
         }
     }
 }
